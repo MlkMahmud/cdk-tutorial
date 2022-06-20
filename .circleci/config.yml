@@ -1,0 +1,28 @@
+version: 2.1
+orbs:
+  aws-cli: circleci/aws-cli@3.1.1
+
+jobs:
+  QA:
+    executor: aws-cli/default
+    steps:
+      - checkout
+      - run:
+          name: Install deps
+          command: npm install
+      - aws-cli/setup:
+          aws-access-key-id: AWS_ACCESS_KEY_ID
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+          aws-region: AWS_DEFAULT_REGION
+      - run:
+          name: CDK Deploy
+          command: |
+            npm run deploy
+
+workflows:
+  main:
+    when:
+      and:
+        - equal: [main, << pipeline.git.branch >>]
+    jobs:
+      - QA
